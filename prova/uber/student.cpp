@@ -1,62 +1,72 @@
 #include <iostream>
 #include "fn.hpp"
 
+using namespace std;
 
-class Pessoa{
+class Pessoa {
 private: 
-    std::string nome;
+   
+    string nome;
     int dinheiro;
 
 public:
     Pessoa(): nome(""), dinheiro(0) {}
 
-    std::string getNome () { return nome; }
+    string getNome () { return nome; }
 
     int getDinheiro () const { return dinheiro; }
 
-    void setNome(const std::string &novoNome) { nome = novoNome; }
-    void setDinheiro(int novoDinheiro) { dinheiro = novoDinheiro; }
+    string setNome (const string &novoNome) { this->nome = novoNome; }
 
+    int setDinheiro (int novoDinheiro) { this->dinheiro = dinheiro; }
+
+    
+    void aumentarDinheiro(int valor) {
+        this->dinheiro += valor;}
+
+    void diminuirDinheiro(int valor) {
+        if(this->dinheiro < valor) {
+            this->dinheiro = 0;
+            return;
+        }
+        this->dinheiro -= valor;
+    }
 
 };
 
-class Moto{
+class Moto {
 private: 
+    
     int custo;
-    std::shared_ptr<Pessoa> motorista;
-    std::shared_ptr<Pessoa> passageiro;
+    shared_ptr<Pessoa> motorista;
+    shared_ptr<Pessoa> passageiro;
 
 public:
     Moto(): custo(0), motorista(nullptr), passageiro(nullptr) {}
 
     int getCusto () const { return custo; }
-    std::shared_ptr<Pessoa> getMotorista () { return motorista; }
-    std::shared_ptr<Pessoa> getPassageiro () { return passageiro; }
+    shared_ptr<Pessoa> getMotorista () { return motorista; }
+    shared_ptr<Pessoa> getPassageiro () { return passageiro; }
 
     void setCusto (int novoCusto) { custo = novoCusto; }
-    void setMotorista(std::shared_ptr<Pessoa> novoMotorista) { motorista = novoMotorista; }
-    void setPassageiro(std::shared_ptr<Pessoa> novoPassageiro) { passageiro = novoPassageiro; }
+    void setMotorista(shared_ptr<Pessoa> novoMotorista) { motorista = novoMotorista; }
+    void setPassageiro(shared_ptr<Pessoa> novoPassageiro) { passageiro = novoPassageiro; }
 
 };
 
 class Adapter {
 private:
-    std::shared_ptr<Moto> moto;
-    std::shared_ptr<Pessoa> pessoa;
+   
+   shared_ptr<Moto> moto;
 
 public:
 
-    void setPessoa (std::shared_ptr<Pessoa> person) {
-        this->pessoa = person;
-    }
 
-    void setMoto (std::shared_ptr<Moto> mot) {
-        this->moto = mot;
-    }
+    Adapter(): moto(make_shared<Moto>()) {}
 
 
-    void setDriver(std::string name, int money) {
-        auto driver = std::make_shared<Pessoa>();
+    void setDriver(string name, int money) {
+        auto driver = make_shared<Pessoa>();
         driver->setNome(name);
         driver->setDinheiro(money);
         moto->setMotorista(driver);
@@ -67,7 +77,7 @@ public:
             fn::write("Não há motorista.");
             return;
         }
-        auto pass = std::make_shared<Pessoa>();
+        auto pass = make_shared<Pessoa>();
         pass->setNome(name);
         pass->setDinheiro(money);
         moto->setPassageiro(pass);
@@ -82,8 +92,9 @@ public:
     }
     
     void leavePass() {
-        
+        pass->diminuirDinheiro(moto->getCusto());
     }
+    
     void show() {
         fn::write("Motorista: " + (moto->getMotorista() ? moto->getMotorista()->getNome() : "none") + 
               ", Passageiro: " + (moto->getPassageiro() ? moto->getPassageiro()->getNome() : "none") + 
