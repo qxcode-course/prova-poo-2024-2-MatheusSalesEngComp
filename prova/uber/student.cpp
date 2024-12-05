@@ -16,9 +16,9 @@ public:
 
     int getDinheiro () const { return dinheiro; }
 
-    string setNome (const string &novoNome) { this->nome = novoNome; }
+    void setNome (const string &novoNome) { this->nome = novoNome; }
 
-    int setDinheiro (int novoDinheiro) { this->dinheiro = dinheiro; }
+    void setDinheiro (int novoDinheiro) { this->dinheiro = novoDinheiro; }
 
     
     void aumentarDinheiro(int valor) {
@@ -48,7 +48,7 @@ public:
     shared_ptr<Pessoa> getMotorista () { return motorista; }
     shared_ptr<Pessoa> getPassageiro () { return passageiro; }
 
-    void setCusto (int novoCusto) { custo = novoCusto; }
+    void setCusto (int novoCusto) { custo += novoCusto; }
     void setMotorista(shared_ptr<Pessoa> novoMotorista) { motorista = novoMotorista; }
     void setPassageiro(shared_ptr<Pessoa> novoPassageiro) { passageiro = novoPassageiro; }
 
@@ -72,7 +72,7 @@ public:
         moto->setMotorista(driver);
     }
     
-    void setPass(std::string name, int money) {
+    void setPass(string name, int money) {
         if (!moto->getMotorista()){
             fn::write("Não há motorista.");
             return;
@@ -84,21 +84,41 @@ public:
     }
 
     void drive(int distance) {
+        auto pass = moto->getPassageiro();
         if ((!moto->getMotorista()) || (!moto->getPassageiro())){
             fn::write("Não há motorista ou passageiro.");
             return;
         }
+        
         moto->setCusto(distance);
     }
     
     void leavePass() {
-        pass->diminuirDinheiro(moto->getCusto());
+        auto pass = moto->getPassageiro();
+        auto driver = moto->getMotorista();
+        if (pass && driver) {
+            if (pass->getDinheiro() < moto->getCusto()) {
+                pass->setDinheiro(0);
+                fn::write ("fail: Passenger does not have enough money");
+            }
+            pass->diminuirDinheiro(moto->getCusto());
+            driver->aumentarDinheiro(moto->getCusto());
+            fn::write(pass->getNome() + ":" + to_string(pass->getDinheiro()) + " leave");
+            moto->setCusto((moto->getCusto())*(-1));
+            moto->setPassageiro(nullptr);
+
+            return;
+        }
+        fn::write ("Não há passageiro.");
+
+        
     }
     
     void show() {
-        fn::write("Motorista: " + (moto->getMotorista() ? moto->getMotorista()->getNome() : "none") + 
-              ", Passageiro: " + (moto->getPassageiro() ? moto->getPassageiro()->getNome() : "none") + 
-              ", Custo: " + std::to_string(moto->getCusto()) + "\n");
+        fn::write("Cost: " + to_string(moto->getCusto()) + ", "
+                + "Driver: " + (moto->getMotorista() ? moto->getMotorista()->getNome() + ":" + to_string(moto->getMotorista()->getDinheiro()) + ", " : "None, ") + 
+                + "Passenger: " + (moto->getPassageiro() ? moto->getPassageiro()->getNome() + ":" +  to_string(moto->getPassageiro()->getDinheiro()) : "None"));
+
 
     }
 };

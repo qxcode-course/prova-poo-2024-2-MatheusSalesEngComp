@@ -2,7 +2,83 @@
     "patches": [
         {
             "label": "2024-12-04_18-32-57",
-            "content": "#include <iostream>\n#include \"fn.hpp\"\n\n\nclass Pessoa{\nprivate: \n    std::string nome;\n    int dinheiro;\n\npublic:\n    Pessoa(): nome(\"\"), dinheiro(0) {}\n\n    std::string getNome () { return nome; }\n\n    int getDinheiro () const { return dinheiro; }\n\n    void setNome(const std::string &novoNome) { nome = novoNome; }\n    void setDinheiro(int novoDinheiro) { dinheiro = novoDinheiro; }\n\n\n};\n\nclass Moto{\nprivate: \n    int custo;\n    std::shared_ptr<Pessoa> motorista;\n    std::shared_ptr<Pessoa> passageiro;\n\npublic:\n    Moto(): custo(0), motorista(nullptr), passageiro(nullptr) {}\n\n    int getCusto () const { return custo; }\n    std::shared_ptr<Pessoa> getMotorista () { return motorista; }\n    std::shared_ptr<Pessoa> getPassageiro () { return passageiro; }\n\n    void setCusto (int novoCusto) { custo = novoCusto; }\n    void setMotorista(std::shared_ptr<Pessoa> novoMotorista) { motorista = novoMotorista; }\n    void setPassageiro(std::shared_ptr<Pessoa> novoPassageiro) { passageiro = novoPassageiro; }\n\n};\n\nclass Adapter {\nprivate:\n    std::shared_ptr<Moto> moto;\n    std::shared_ptr<Pessoa> pessoa;\n\npublic:\n\n    void setPessoa (std::shared_ptr<Pessoa> person) {\n        this->pessoa = person;\n    }\n\n    void setMoto (std::shared_ptr<Moto> mot) {\n        this->moto = mot;\n    }\n\n\n    void setDriver(std::string name, int money) {\n        auto driver = std::make_shared<Pessoa>();\n        driver->setNome(name);\n        driver->setDinheiro(money);\n        moto->setMotorista(driver);\n    }\n    \n    void setPass(std::string name, int money) {\n        if (!moto->getMotorista()){\n            fn::write(\"N\u00e3o h\u00e1 motorista.\");\n            return;\n        }\n        auto pass = std::make_shared<Pessoa>();\n        pass->setNome(name);\n        pass->setDinheiro(money);\n        moto->setPassageiro(pass);\n    }\n\n    void drive(int distance) {\n        if ((!moto->getMotorista()) || (!moto->getPassageiro())){\n            fn::write(\"N\u00e3o h\u00e1 motorista ou passageiro.\");\n            return;\n        }\n        moto->setCusto(distance);\n    }\n    \n    void leavePass() {\n        \n    }\n    void show() {\n        fn::write(\"Motorista: \" + (moto->getMotorista() ? moto->getMotorista()->getNome() : \"none\") + \n              \", Passageiro: \" + (moto->getPassageiro() ? moto->getPassageiro()->getNome() : \"none\") + \n              \", Custo: \" + std::to_string(moto->getCusto()) + \"\\n\");\n\n    }\n};\n\nint main() {\n    Adapter adp;\n    while (true) {\n        fn::write(\"$\", \"\");\n        auto line = fn::input();\n        auto args = fn::split(line, ' ');\n        fn::write(line);\n\n        if      (args[0] == \"end\")       { break;                                  }\n        else if (args[0] == \"setDriver\") { adp.setDriver(args[1], +args[2]);       }\n        else if (args[0] == \"setPass\")   { adp.setPass(args[1], +args[2]);         }\n        else if (args[0] == \"drive\")     { adp.drive(+args[1]);                    }\n        else if (args[0] == \"leavePass\") { adp.leavePass();                        }\n        else if (args[0] == \"show\")      { adp.show();                             }\n        else                             { fn::write(\"fail: command not found\\n\"); }\n    }\n}\n"
+            "content": "@@ -36,29 +36,8 @@\n p%22%0A%0A\n-using namespace std;%0A\n %0Acla\n@@ -45,17 +45,16 @@\n s Pessoa\n- \n %7B%0Aprivat\n@@ -60,21 +60,22 @@\n te: %0A   \n-%0A    \n+ std::\n string n\n@@ -146,24 +146,29 @@\n (0) %7B%7D%0A%0A    \n+std::\n string getNo\n@@ -250,22 +250,20 @@\n     \n-string\n+void\n  setNome\n  (co\n@@ -262,16 +262,20 @@\n Nome\n- \n (const \n+std::\n stri\n@@ -290,22 +290,16 @@\n Nome) %7B \n-this-%3E\n nome = n\n@@ -309,24 +309,24 @@\n Nome; %7D%0A\n-%0A\n     \n-int\n+void\n  setDinh\n@@ -329,17 +329,16 @@\n Dinheiro\n- \n (int nov\n@@ -350,22 +350,16 @@\n eiro) %7B \n-this-%3E\n dinheiro\n@@ -365,276 +365,24 @@\n o = \n-dinheiro; %7D%0A%0A    %0A    void aumentarDinheiro(int valor) %7B%0A        this-%3Edinheiro += valor;%7D%0A%0A    void diminuirDinheiro(int valor) %7B%0A        if(this-%3Edinheiro %3C valor) %7B%0A            this-%3Edinheiro = 0;%0A            return;%0A        %7D%0A        this-%3Edinheiro -= valor;%0A    %7D\n+novoDinheiro; %7D%0A\n %0A%0A%7D;\n@@ -393,17 +393,16 @@\n ass Moto\n- \n %7B%0Aprivat\n@@ -405,21 +405,16 @@\n ivate: %0A\n-    %0A\n     int \n@@ -420,24 +420,29 @@\n  custo;%0A    \n+std::\n shared_ptr%3CP\n@@ -459,24 +459,29 @@\n orista;%0A    \n+std::\n shared_ptr%3CP\n@@ -614,32 +614,37 @@\n rn custo; %7D%0A    \n+std::\n shared_ptr%3CPesso\n@@ -688,16 +688,21 @@\n ; %7D%0A    \n+std::\n shared_p\n@@ -832,16 +832,21 @@\n torista(\n+std::\n shared_p\n@@ -925,16 +925,21 @@\n sageiro(\n+std::\n shared_p\n@@ -1031,20 +1031,22 @@\n ate:%0A   \n-%0A   \n+ std::\n shared_p\n@@ -1059,16 +1059,52 @@\n o%3E moto;\n+%0A    std::shared_ptr%3CPessoa%3E pessoa;\n %0A%0Apublic\n@@ -1110,51 +1110,177 @@\n c:%0A%0A\n-%0A\n     \n-Adapter(): moto(make_\n+void setPessoa (std::shared_ptr%3CPessoa%3E person) %7B%0A        this-%3Epessoa = person;%0A    %7D%0A%0A    void setMoto (std::\n shared\n+_ptr\n %3CMoto%3E\n-()) %7B\n+ mot) %7B%0A        this-%3Emoto = mot;%0A    \n %7D%0A%0A%0A\n@@ -1298,16 +1298,21 @@\n tDriver(\n+std::\n string n\n@@ -1351,16 +1351,21 @@\n river = \n+std::\n make_sha\n@@ -1671,16 +1671,21 @@\n  pass = \n+std::\n make_sha\n@@ -2069,60 +2069,14 @@\n     \n-pass-%3EdiminuirDinheiro(moto-%3EgetCusto());%0A    %7D\n %0A    \n+%7D\n %0A   \n"
+        },
+        {
+            "label": "2024-12-05_13-32-50",
+            "content": "@@ -388,21 +388,17 @@\n heiro = \n-novoD\n+d\n inheiro;\n@@ -1591,16 +1591,21 @@\n setPass(\n+std::\n string n\n@@ -2141,37 +2141,20 @@\n         \n-moto-%3EgetPassageiro()\n+pass\n -%3Ediminu\n@@ -2447,16 +2447,21 @@\n to: %22 + \n+std::\n to_strin\n"
+        },
+        {
+            "label": "2024-12-05_13-37-29",
+            "content": "@@ -258,28 +258,30 @@\n iro; %7D%0A%0A    \n-void\n+string\n  setNome (co\n@@ -330,28 +330,27 @@\n ome; %7D%0A%0A    \n-void\n+int\n  setDinheiro\n@@ -2139,28 +2139,16 @@\n %0A       \n- auto pass =\n  moto-%3Eg\n@@ -2165,46 +2165,8 @@\n ro()\n-;%0A        if (pass) %7B%0A            pass\n -%3Edi\n@@ -2207,204 +2207,61 @@\n     \n-        return;%0A        %7D%0A        fn::write (%22N%C3%A3o h%C3%A1 passageiro.%22);%0A%0A        %0A    %7D%0A    %0A    void show() %7B%0A        fn::write(%22Cost: %22 + to_string(moto-%3EgetCusto()) + %22, %22%0A                + %22Driver\n+%7D%0A    %0A    void show() %7B%0A        fn::write(%22Motorista\n : %22 \n@@ -2321,73 +2321,16 @@\n me()\n- + %22:%22 + to_string(moto-%3EgetMotorista()-%3EgetDinheiro())\n  : %22\n-N\n+n\n one\n-, \n %22) +\n@@ -2349,22 +2349,21 @@\n     \n-  + %22Passenger\n+%22, Passageiro\n : %22 \n@@ -2426,16 +2426,48 @@\n e() \n-+ %22:\n+: %22none%22) + %0A              %22, Custo: \n %22 +\n- \n  to_\n@@ -2486,49 +2486,25 @@\n %3Eget\n-Passageiro()-%3EgetDinheir\n+Cust\n o()) \n-: %22None%22));%0A\n++ %22%5Cn%22);\n %0A%0A  \n"
+        },
+        {
+            "label": "2024-12-05_13-54-12",
+            "content": "@@ -2564,23 +2564,16 @@\n heiro())\n- + %22, %22\n  : %22None\n"
+        },
+        {
+            "label": "2024-12-05_13-55-31",
+            "content": "@@ -2252,98 +2252,8 @@\n ));%0A\n-            fn::write(pass-%3EgetNome() + %22:%22 + to_string(pass-%3EgetDinheiro()) + %22 leave%22);%0A\n     \n"
+        },
+        {
+            "label": "2024-12-05_13-59-07",
+            "content": "@@ -2186,155 +2186,45 @@\n     \n-auto driver = moto-%3EgetMotorista();%0A        if (pass && driver) %7B%0A            pass-%3EdiminuirDinheiro(moto-%3EgetCusto());%0A            driver-%3Eaumenta\n+if (pass) %7B%0A            pass-%3Ediminui\n rDin\n"
+        },
+        {
+            "label": "2024-12-05_14-04-05",
+            "content": "@@ -2452,39 +2452,8 @@\n %22);%0A\n-            moto-%3EsetCusto(0);%0A\n     \n"
+        },
+        {
+            "label": "2024-12-05_14-07-20",
+            "content": "@@ -2463,10 +2463,8 @@\n     \n-//\n  mot\n"
+        },
+        {
+            "label": "2024-12-05_14-07-45",
+            "content": "@@ -2455,24 +2455,26 @@\n %0A           \n+//\n  moto-%3EsetCu\n"
+        },
+        {
+            "label": "2024-12-05_14-07-55",
+            "content": "@@ -2483,78 +2483,8 @@\n 0);%0A\n-            pass-%3EsetNome(nullptr);%0A            pass-%3EsetDinheiro(0);%0A\n     \n"
+        },
+        {
+            "label": "2024-12-05_14-15-14",
+            "content": "@@ -2491,35 +2491,29 @@\n         \n-moto\n+pass\n -%3Eset\n-Passageiro\n+Nome\n (nullptr\n"
+        },
+        {
+            "label": "2024-12-05_14-17-22",
+            "content": "@@ -2495,10 +2495,8 @@\n     \n-//\n moto\n@@ -2521,16 +2521,49 @@\n llptr);%0A\n+            pass-%3EsetDinheiro(0);\n %0A       \n"
+        },
+        {
+            "label": "2024-12-05_14-18-38",
+            "content": "@@ -2483,32 +2483,34 @@\n 0);%0A            \n+//\n moto-%3EsetPassage\n"
+        },
+        {
+            "label": "2024-12-05_14-18-49",
+            "content": "@@ -1063,17 +1063,16 @@\n %7B custo \n-+\n = novoCu\n"
+        },
+        {
+            "label": "2024-12-05_14-21-24",
+            "content": "@@ -2480,31 +2480,9 @@\n sto(\n-(moto-%3EgetCusto())*(-1)\n+0\n );%0A \n"
+        },
+        {
+            "label": "2024-12-05_14-23-44",
+            "content": "@@ -1914,51 +1914,8 @@\n ) %7B%0A\n-        auto pass = moto-%3EgetPassageiro();%0A\n     \n@@ -2068,149 +2068,8 @@\n   %7D%0A\n-        if (pass-%3EgetDinheiro() %3C= 0) %7B%0A            fn::write (%22fail: Passenger does not have enough money %22);%0A            return;%0A        %7D%0A\n     \n"
+        },
+        {
+            "label": "2024-12-05_14-28-24",
+            "content": "@@ -2111,24 +2111,156 @@\n   %7D%0A        \n+if (pass-%3EgetDinheiro() %3C= 0) %7B%0A            fn::write (%22fail: Passenger does not have enough money %22);%0A            return;%0A        %7D\n %0A        mot\n@@ -2437,141 +2437,8 @@\n ) %7B%0A\n-            if (pass-%3EgetDinheiro() %3C= 0) %7B%0A                fn::write (%22fail: Passenger does not have enough money %22);%0A            %7D%0A\n     \n"
+        },
+        {
+            "label": "2024-12-05_14-30-10",
+            "content": "@@ -2342,66 +2342,14 @@\n () %3C\n- moto-%3EgetCusto()) %7B%0A                pass-%3EsetDinheiro(0);\n+= 0) %7B\n %0A   \n"
+        },
+        {
+            "label": "2024-12-05_14-38-25",
+            "content": "@@ -2467,16 +2467,17 @@\n gh money\n+ \n %22);%0A    \n"
+        },
+        {
+            "label": "2024-12-05_14-38-46",
+            "content": "#include <iostream>\n#include \"fn.hpp\"\n\nusing namespace std;\n\nclass Pessoa {\nprivate: \n   \n    string nome;\n    int dinheiro;\n\npublic:\n    Pessoa(): nome(\"\"), dinheiro(0) {}\n\n    string getNome () { return nome; }\n\n    int getDinheiro () const { return dinheiro; }\n\n    void setNome (const string &novoNome) { this->nome = novoNome; }\n\n    void setDinheiro (int novoDinheiro) { this->dinheiro = novoDinheiro; }\n\n    \n    void aumentarDinheiro(int valor) {\n        this->dinheiro += valor;}\n\n    void diminuirDinheiro(int valor) {\n        if(this->dinheiro < valor) {\n            this->dinheiro = 0;\n            return;\n        }\n        this->dinheiro -= valor;\n    }\n\n};\n\nclass Moto {\nprivate: \n    \n    int custo;\n    shared_ptr<Pessoa> motorista;\n    shared_ptr<Pessoa> passageiro;\n\npublic:\n    Moto(): custo(0), motorista(nullptr), passageiro(nullptr) {}\n\n    int getCusto () const { return custo; }\n    shared_ptr<Pessoa> getMotorista () { return motorista; }\n    shared_ptr<Pessoa> getPassageiro () { return passageiro; }\n\n    void setCusto (int novoCusto) { custo += novoCusto; }\n    void setMotorista(shared_ptr<Pessoa> novoMotorista) { motorista = novoMotorista; }\n    void setPassageiro(shared_ptr<Pessoa> novoPassageiro) { passageiro = novoPassageiro; }\n\n};\n\nclass Adapter {\nprivate:\n   \n   shared_ptr<Moto> moto;\n\npublic:\n\n\n    Adapter(): moto(make_shared<Moto>()) {}\n\n\n    void setDriver(string name, int money) {\n        auto driver = make_shared<Pessoa>();\n        driver->setNome(name);\n        driver->setDinheiro(money);\n        moto->setMotorista(driver);\n    }\n    \n    void setPass(string name, int money) {\n        if (!moto->getMotorista()){\n            fn::write(\"N\u00e3o h\u00e1 motorista.\");\n            return;\n        }\n        auto pass = make_shared<Pessoa>();\n        pass->setNome(name);\n        pass->setDinheiro(money);\n        moto->setPassageiro(pass);\n    }\n\n    void drive(int distance) {\n        auto pass = moto->getPassageiro();\n        if ((!moto->getMotorista()) || (!moto->getPassageiro())){\n            fn::write(\"N\u00e3o h\u00e1 motorista ou passageiro.\");\n            return;\n        }\n        \n        moto->setCusto(distance);\n    }\n    \n    void leavePass() {\n        auto pass = moto->getPassageiro();\n        auto driver = moto->getMotorista();\n        if (pass && driver) {\n            if (pass->getDinheiro() < moto->getCusto()) {\n                pass->setDinheiro(0);\n                fn::write (\"fail: Passenger does not have enough money\");\n            }\n            pass->diminuirDinheiro(moto->getCusto());\n            driver->aumentarDinheiro(moto->getCusto());\n            fn::write(pass->getNome() + \":\" + to_string(pass->getDinheiro()) + \" leave\");\n            moto->setCusto((moto->getCusto())*(-1));\n            moto->setPassageiro(nullptr);\n\n            return;\n        }\n        fn::write (\"N\u00e3o h\u00e1 passageiro.\");\n\n        \n    }\n    \n    void show() {\n        fn::write(\"Cost: \" + to_string(moto->getCusto()) + \", \"\n                + \"Driver: \" + (moto->getMotorista() ? moto->getMotorista()->getNome() + \":\" + to_string(moto->getMotorista()->getDinheiro()) + \", \" : \"None, \") + \n                + \"Passenger: \" + (moto->getPassageiro() ? moto->getPassageiro()->getNome() + \":\" +  to_string(moto->getPassageiro()->getDinheiro()) : \"None\"));\n\n\n    }\n};\n\nint main() {\n    Adapter adp;\n    while (true) {\n        fn::write(\"$\", \"\");\n        auto line = fn::input();\n        auto args = fn::split(line, ' ');\n        fn::write(line);\n\n        if      (args[0] == \"end\")       { break;                                  }\n        else if (args[0] == \"setDriver\") { adp.setDriver(args[1], +args[2]);       }\n        else if (args[0] == \"setPass\")   { adp.setPass(args[1], +args[2]);         }\n        else if (args[0] == \"drive\")     { adp.drive(+args[1]);                    }\n        else if (args[0] == \"leavePass\") { adp.leavePass();                        }\n        else if (args[0] == \"show\")      { adp.show();                             }\n        else                             { fn::write(\"fail: command not found\\n\"); }\n    }\n}\n"
         }
     ]
 }
